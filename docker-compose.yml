@@ -1,0 +1,144 @@
+version: '3.9'
+
+services:
+  # ------ API Gateway (The Front Door) ------ #
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "3000:3000" # This is the only port the outside world needs to access
+    volumes:
+      - ./api-gateway:/app
+      - /app/node_modules
+    env_file: .env
+    depends_on:
+      - user-service
+#       - post-service
+#       - interaction-service
+#       - social-graph-service
+#       - feed-service
+
+  # ------ Application Services ------ #
+  user-service:
+    build: ./user-service
+    container_name: user-service
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./user-service:/app
+      - /app/node_modules
+    env_file: .env
+    environment:
+      - DATABASE_URL=${USER_DATABASE_URL}
+    depends_on:
+      - user-db
+
+#   post-service:
+#     build: ./post-service
+#     container_name: post-service
+#     ports:
+#       - "3002:3002"
+#     volumes:
+#       - ./post-service:/app
+#     env_file: .env
+#     depends_on:
+#       - post-db
+
+#   interaction-service:
+#     build: ./interaction-service
+#     container_name: interaction-service
+#     ports:
+#       - "3003:3003"
+#     volumes:
+#       - ./interaction-service:/app
+#     env_file: .env
+#     depends_on:
+#       - interaction-db
+
+#   social-graph-service:
+#     build: ./social-graph-service
+#     container_name: social-graph-service
+#     ports:
+#       - "3004:3004"
+#     volumes:
+#       - ./social-graph-service:/app
+#     env_file: .env
+#     depends_on:
+#       - social-db
+
+#   feed-service:
+#     build: ./feed-service
+#     container_name: feed-service
+#     ports:
+#       - "3005:3005"
+#     volumes:
+#       - ./feed-service:/app
+#     env_file: .env
+#     depends_on:
+#       - redis
+
+  # ------ Databases & Cache ------ #
+  user-db:
+    image: postgres:16-alpine
+    container_name: user-db
+    environment:
+      POSTGRES_DB: ${USER_DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - user_db_data:/var/lib/postgresql/data
+      - ./user-service/sql/schema.sql:/docker-entrypoint-initdb.d/init.sql
+
+#   post-db:
+#     image: postgres:16-alpine
+#     container_name: post-db
+#     environment:
+#       POSTGRES_DB: ${POST_DB_NAME}
+#       POSTGRES_USER: ${DB_USER}
+#       POSTGRES_PASSWORD: ${DB_PASSWORD}
+#     ports:
+#       - "5433:5432"
+#     volumes:
+#       - post_db_data:/var/lib/postgresql/data
+
+#   interaction-db:
+#     image: postgres:16-alpine
+#     container_name: interaction-db
+#     environment:
+#       POSTGRES_DB: ${INTERACTION_DB_NAME}
+#       POSTGRES_USER: ${DB_USER}
+#       POSTGRES_PASSWORD: ${DB_PASSWORD}
+#     ports:
+#       - "5434:5432"
+#     volumes:
+#       - interaction_db_data:/var/lib/postgresql/data
+
+#   social-db:
+#     image: postgres:16-alpine
+#     container_name: social-db
+#     environment:
+#       POSTGRES_DB: ${SOCIAL_DB_NAME}
+#       POSTGRES_USER: ${DB_USER}
+#       POSTGRES_PASSWORD: ${DB_PASSWORD}
+#     ports:
+#       - "5435:5432"
+#     volumes:
+#       - social_db_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis-cache
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+# Named volumes to persist data
+volumes:
+  user_db_data:
+#   post_db_data:
+#   interaction_db_data:
+#   social_db_data:
+  redis_data:
