@@ -13,7 +13,7 @@ services:
     env_file: .env
     depends_on:
       - user-service
-#       - post-service
+      - post-service
 #       - interaction-service
 #       - social-graph-service
 #       - feed-service
@@ -33,16 +33,19 @@ services:
     depends_on:
       - user-db
 
-#   post-service:
-#     build: ./post-service
-#     container_name: post-service
-#     ports:
-#       - "3002:3002"
-#     volumes:
-#       - ./post-service:/app
-#     env_file: .env
-#     depends_on:
-#       - post-db
+  post-service:
+    build: ./post-service
+    container_name: post-service
+    ports:
+      - "3002:3002"
+    volumes:
+      - ./post-service:/app
+      - /app/node_modules
+    env_file: .env
+    environment:
+      - DATABASE_URL=${POST_DATABASE_URL}
+    depends_on:
+      - post-db
 
 #   interaction-service:
 #     build: ./interaction-service
@@ -91,17 +94,18 @@ services:
       - user_db_data:/var/lib/postgresql/data
       - ./user-service/sql/schema.sql:/docker-entrypoint-initdb.d/init.sql
 
-#   post-db:
-#     image: postgres:16-alpine
-#     container_name: post-db
-#     environment:
-#       POSTGRES_DB: ${POST_DB_NAME}
-#       POSTGRES_USER: ${DB_USER}
-#       POSTGRES_PASSWORD: ${DB_PASSWORD}
-#     ports:
-#       - "5433:5432"
-#     volumes:
-#       - post_db_data:/var/lib/postgresql/data
+  post-db:
+    image: postgres:16-alpine
+    container_name: post-db
+    environment:
+      POSTGRES_DB: ${POST_DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5433:5432"
+    volumes:
+      - post_db_data:/var/lib/postgresql/data
+      - ./post-service/sql/schema.sql:/docker-entrypoint-initdb.d/init.sql
 
 #   interaction-db:
 #     image: postgres:16-alpine
@@ -138,7 +142,7 @@ services:
 # Named volumes to persist data
 volumes:
   user_db_data:
-#   post_db_data:
+  post_db_data:
 #   interaction_db_data:
 #   social_db_data:
   redis_data:
