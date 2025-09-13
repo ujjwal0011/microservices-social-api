@@ -22,6 +22,6 @@ router.put(
   updateUserProfile
 );
 
-// router.get("/:userId/profile", getUserProfile);
+router.get("/:userId/profile", getUserProfile);
 
 export default router;

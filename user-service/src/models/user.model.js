@@ -11,6 +11,7 @@ export const getUserById = async (id) => {
   try {
     const cachedUser = await redis.get(cacheKey);
     if (cachedUser) {
+      logger.verbose(`Cache hit for user ID: ${id}`);
       return JSON.parse(cachedUser);
     }
   } catch (error) {
