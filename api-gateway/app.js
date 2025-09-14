@@ -43,9 +43,24 @@ app.use(
 );
 
 // 4. Other services
-app.use("/api/posts", proxy(POST_SERVICE_URL));
-app.use("/api/likes", proxy(INTERACTION_SERVICE_URL));
-app.use("/api/comments", proxy(INTERACTION_SERVICE_URL));
+app.use(
+  "/api/posts",
+  proxy(POST_SERVICE_URL, {
+    proxyReqPathResolver: (req) => `/api/posts${req.url}`,
+  })
+);
+app.use(
+  "/api/likes",
+  proxy(INTERACTION_SERVICE_URL, {
+    proxyReqPathResolver: (req) => `/api/likes${req.url}`,
+  })
+);
+app.use(
+  "/api/comments",
+  proxy(INTERACTION_SERVICE_URL, {
+    proxyReqPathResolver: (req) => `/api/comments${req.url}`,
+  })
+);
 app.use("/api/feed", proxy(FEED_SERVICE_URL));
 
 app.listen(PORT, () => {

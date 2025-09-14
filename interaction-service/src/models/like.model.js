@@ -33,6 +33,7 @@ export const getLikerIdsByPostId = async (postId) => {
   try {
     const cachedLikers = await redis.get(cacheKey);
     if (cachedLikers) {
+      logger.verbose("Cache hit for liker IDs of post:", postId);
       return JSON.parse(cachedLikers);
     }
   } catch (error) {
@@ -65,10 +66,11 @@ export const getLikeCountByPostId = async (postId) => {
   try {
     const cachedCount = await redis.get(cacheKey);
     if (cachedCount) {
+      logger.verbose("Cache hit for like count of post:", postId);
       return parseInt(cachedCount, 10);
     }
   } catch (error) {
-    logger.error("Redis GET error in getLikeCountByPostId:", error);
+    logger.critical("Redis GET error in getLikeCountByPostId:", error);
   }
 
   const result = await query(

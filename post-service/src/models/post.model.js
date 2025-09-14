@@ -88,7 +88,7 @@ export const updatePost = async (postId, userId, { content, media_url }) => {
     try {
       await redis.del(cacheKey);
     } catch (error) {
-      logger.error("Redis DEL error in updatePost:", error);
+      logger.critical("Redis DEL error in updatePost:", error);
     }
   }
 
@@ -113,7 +113,7 @@ export const deletePost = async (postId, userId) => {
     try {
       await redis.del(cacheKey);
     } catch (error) {
-      logger.error("Redis DEL error in deletePost:", error);
+      logger.critical("Redis DEL error in deletePost:", error);
     }
   }
 

@@ -9,6 +9,10 @@ import { authenticateToken } from "../middleware/auth.js";
 
 const router = express.Router();
 
+router.get("/health", (req, res) => {
+  res.status(200).json({ status: "UP", service: "interaction-service" });
+});
+
 router.get("/post/:postId/count", handleGetLikeCount);
 
 router.get("/post/:postId", handleGetPostLikes);
@@ -16,3 +20,5 @@ router.get("/post/:postId", handleGetPostLikes);
 router.post("/post/:postId", authenticateToken, handleLikePost);
 
 router.delete("/post/:postId", authenticateToken, handleUnlikePost);
+
+export default router;

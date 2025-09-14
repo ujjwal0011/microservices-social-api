@@ -14,7 +14,7 @@ services:
     depends_on:
       - user-service
       - post-service
-#       - interaction-service
+      - interaction-service
 #       - social-graph-service
 #       - feed-service
 
@@ -47,16 +47,19 @@ services:
     depends_on:
       - post-db
 
-#   interaction-service:
-#     build: ./interaction-service
-#     container_name: interaction-service
-#     ports:
-#       - "3003:3003"
-#     volumes:
-#       - ./interaction-service:/app
-#     env_file: .env
-#     depends_on:
-#       - interaction-db
+  interaction-service:
+    build: ./interaction-service
+    container_name: interaction-service
+    ports:
+      - "3003:3003"
+    volumes:
+      - ./interaction-service:/app
+      - /app/node_modules
+    env_file: .env
+    environment:
+      - DATABASE_URL=${INTERACTION_DATABASE_URL}
+    depends_on:
+      - interaction-db
 
 #   social-graph-service:
 #     build: ./social-graph-service
@@ -107,17 +110,18 @@ services:
       - post_db_data:/var/lib/postgresql/data
       - ./post-service/sql/schema.sql:/docker-entrypoint-initdb.d/init.sql
 
-#   interaction-db:
-#     image: postgres:16-alpine
-#     container_name: interaction-db
-#     environment:
-#       POSTGRES_DB: ${INTERACTION_DB_NAME}
-#       POSTGRES_USER: ${DB_USER}
-#       POSTGRES_PASSWORD: ${DB_PASSWORD}
-#     ports:
-#       - "5434:5432"
-#     volumes:
-#       - interaction_db_data:/var/lib/postgresql/data
+  interaction-db:
+    image: postgres:16-alpine
+    container_name: interaction-db
+    environment:
+      POSTGRES_DB: ${INTERACTION_DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5434:5432"
+    volumes:
+      - interaction_db_data:/var/lib/postgresql/data
+      - ./interaction-service/sql/schema.sql:/docker-entrypoint-initdb.d/init.sql
 
 #   social-db:
 #     image: postgres:16-alpine
@@ -143,6 +147,6 @@ services:
 volumes:
   user_db_data:
   post_db_data:
-#   interaction_db_data:
+  interaction_db_data:
 #   social_db_data:
   redis_data:

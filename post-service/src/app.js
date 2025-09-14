@@ -21,7 +21,7 @@ app.get("/health", (req, res) => {
     res.status(200).json({ status: "UP", service: "post-service" });
 })
 
-app.use("/", postRoutes);
+app.use("/api/posts", postRoutes);
 
 app.use(errorMiddleware);
 
