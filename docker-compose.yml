@@ -61,16 +61,19 @@ services:
     depends_on:
       - interaction-db
 
-#   social-graph-service:
-#     build: ./social-graph-service
-#     container_name: social-graph-service
-#     ports:
-#       - "3004:3004"
-#     volumes:
-#       - ./social-graph-service:/app
-#     env_file: .env
-#     depends_on:
-#       - social-db
+  social-graph-service:
+    build: ./social-graph-service
+    container_name: social-graph-service
+    ports:
+      - "3004:3004"
+    volumes:
+      - ./social-graph-service:/app
+      - /app/node_modules
+    env_file: .env
+    environment:
+      - DATABASE_URL=${SOCIAL_DATABASE_URL}
+    depends_on:
+      - social-db
 
 #   feed-service:
 #     build: ./feed-service
@@ -123,17 +126,18 @@ services:
       - interaction_db_data:/var/lib/postgresql/data
       - ./interaction-service/sql/schema.sql:/docker-entrypoint-initdb.d/init.sql
 
-#   social-db:
-#     image: postgres:16-alpine
-#     container_name: social-db
-#     environment:
-#       POSTGRES_DB: ${SOCIAL_DB_NAME}
-#       POSTGRES_USER: ${DB_USER}
-#       POSTGRES_PASSWORD: ${DB_PASSWORD}
-#     ports:
-#       - "5435:5432"
-#     volumes:
-#       - social_db_data:/var/lib/postgresql/data
+  social-db:
+    image: postgres:16-alpine
+    container_name: social-db
+    environment:
+      POSTGRES_DB: ${SOCIAL_DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5435:5432"
+    volumes:
+      - social_db_data:/var/lib/postgresql/data
+      - ./social-graph-service/sql/schema.sql:/docker-entrypoint-initdb.d/init.sql
 
   redis:
     image: redis:7-alpine
@@ -148,5 +152,5 @@ volumes:
   user_db_data:
   post_db_data:
   interaction_db_data:
-#   social_db_data:
+  social_db_data:
   redis_data:

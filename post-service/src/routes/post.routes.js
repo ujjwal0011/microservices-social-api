@@ -17,6 +17,10 @@ import {
 
 const router = express.Router();
 
+router.get("/health", (req, res) => {
+  res.status(200).json({ status: "UP", service: "post-service" });
+});
+
 router.get("/search", handleSearchPosts);
 
 router.get("/user/:userId", handleGetUserPosts);
