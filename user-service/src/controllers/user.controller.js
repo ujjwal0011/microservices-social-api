@@ -20,19 +20,19 @@ export const getUserProfile = catchAsyncErrors(async (req, res, next) => {
   }
 
   try {
-    // const [followersRes, followingRes] = await Promise.all([
-    //   axios.get(
-    //     `${SOCIAL_GRAPH_SERVICE_URL}/api/users/${userId}/followers/count`
-    //   ),
-    //   axios.get(
-    //     `${SOCIAL_GRAPH_SERVICE_URL}/api/users/${userId}/following/count`
-    //   ),
-    // ]);
+    const [followersRes, followingRes] = await Promise.all([
+      axios.get(
+        `${SOCIAL_GRAPH_SERVICE_URL}/api/social/users/${userId}/followers/count`
+      ),
+      axios.get(
+        `${SOCIAL_GRAPH_SERVICE_URL}/api/social/users/${userId}/following/count`
+      ),
+    ]);
 
     const fullProfile = {
       ...profile,
-      // followers_count: followersRes.data.count,
-      // following_count: followingRes.data.count,
+      followers_count: followersRes.data.followerCount,
+      following_count: followingRes.data.followingCount,
     };
 
     res.status(200).json({ success: true, profile: fullProfile });
