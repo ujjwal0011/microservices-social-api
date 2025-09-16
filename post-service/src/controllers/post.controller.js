@@ -13,9 +13,11 @@ import {
   NotFoundError,
   UnauthorizedError,
 } from "../middleware/error.js";
+import redis from "../utils/redis.js";
 import logger from "../utils/logger.js";
 
 const USER_SERVICE_URL = process.env.USER_SERVICE_URL;
+const STREAM_NAME = "post_events";
 
 const fetchUserDetails = async (userId) => {
   try {
@@ -47,6 +49,27 @@ export const handleCreatePost = catchAsyncErrors(async (req, res, next) => {
     comments_enabled,
     scheduled_at,
   });
+
+  if (newPost.is_published) {
+    try {
+      const message = {
+        postId: newPost.id.toString(),
+        userId: newPost.user_id.toString(),
+        createdAt: newPost.created_at.getTime().toString(),
+      };
+
+      await redis.xadd(STREAM_NAME, "*", ...Object.entries(message).flat());
+
+      logger.verbose(
+        `Event published to redis stream: ${STREAM_NAME} for Post ID: ${newPost.id}`
+      );
+    } catch (error) {
+      logger.critical(
+        `Failed to publish event to redis stream for Post ID: ${newPost.id}:`,
+        error.message
+      );
+    }
+  }
 
   logger.verbose(`Post created with ID: ${newPost.id} by User ID: ${userId}`);
 
