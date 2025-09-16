@@ -6,7 +6,7 @@ services:
     build: ./api-gateway
     container_name: api-gateway
     ports:
-      - "3000:3000" # This is the only port the outside world needs to access
+      - "3000:3000" 
     volumes:
       - ./api-gateway:/app
       - /app/node_modules
@@ -16,7 +16,7 @@ services:
       - post-service
       - interaction-service
       - social-graph-service
-#       - feed-service
+      - feed-service
 
   # ------ Application Services ------ #
   user-service:
@@ -75,16 +75,17 @@ services:
     depends_on:
       - social-db
 
-#   feed-service:
-#     build: ./feed-service
-#     container_name: feed-service
-#     ports:
-#       - "3005:3005"
-#     volumes:
-#       - ./feed-service:/app
-#     env_file: .env
-#     depends_on:
-#       - redis
+  feed-service:
+    build: ./feed-service
+    container_name: feed-service
+    ports:
+      - "3005:3005"
+    volumes:
+      - ./feed-service:/app
+      - /app/node_modules
+    env_file: .env
+    depends_on:
+      - redis
 
   # ------ Databases & Cache ------ #
   user-db:
